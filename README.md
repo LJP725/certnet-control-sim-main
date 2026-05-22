@@ -356,7 +356,6 @@ n_LAct  = 4
 ## Notes on Metrics
 
 - Timings exclude one-time setup overhead.
-- Timing statistics are steady-state evaluation times.
 - Mean and p99 are reported to show both average runtime and tail behavior.
 - Violation rate is computed using the numerical feasibility threshold used in the experiments.
 - A reported `0.00%` violation rate means zero observed violations above the prescribed numerical tolerance.
