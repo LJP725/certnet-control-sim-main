@@ -6,9 +6,16 @@ This repository provides a MATLAB evaluation package for the accompanying manusc
 
 The manuscript is currently under review. This repository is provided to support reproducibility of the reported experiments.
 
-The repository focuses on reproducing the reported evaluation results from released artifacts. It contains pre-synthesized certified libraries, trained controllers, baseline artifacts, compiled MEX evaluators, MATLAB live scripts, and PDF/PNG figures associated with the reported experiments.
+## What This Release Demonstrates
 
-The key idea of CertNet is to decouple hard feasibility from performance learning. Hard feasibility is enforced by a certified geometric executor, while learning is used only to select coefficients within the certified feasible family. Online execution avoids iterative optimization and projection inside CertNet; it reduces to candidate query, learned coefficient generation, and algebraic reconstruction.
+CertNet targets the deployment trade-off among **hard feasibility**, **performance recovery**, and **online latency**:
+
+- **Hard feasibility by construction:** the deployed policy is restricted to a certified feasible family, so hard constraints are protected by geometry rather than by online correction.
+- **Performance recovery by learning:** the neural proposer learns coefficient selection inside the certified family, instead of directly outputting an unconstrained action.
+- **Low-latency deployment:** online CertNet execution avoids iterative optimization and online projection; it uses candidate query, score/simplex mapping, and algebraic reconstruction.
+- **Improved deployment trade-off:** PureNN is fast but can violate hard constraints; NN+Proj restores feasibility but introduces projection overhead and tail latency; online optimization is reliable but slower. CertNet is designed to preserve feasibility while retaining low and predictable runtime.
+
+This repository contains the released experiment artifacts used for evaluation: certified executor objects, trained controllers, baseline artifacts, compiled MEX evaluators, MATLAB live scripts, and PDF/PNG figures associated with the reported experiments.
 
 ---
 
@@ -57,17 +64,17 @@ The key idea of CertNet is to decouple hard feasibility from performance learnin
 
 ---
 
-## Important Release Note
+## Release Organization
 
-This repository is an **evaluation/reproduction release**, not a full from-scratch training and synthesis release.
+This repository is organized around the evaluation stage of the study.
 
-The `.mat` release packs contain the already generated experiment artifacts, including the certified executor objects, trained controllers, baseline data, and evaluation data needed by the demo scripts. The released live scripts load these saved artifacts and reproduce the reported evaluation protocol, figures, and summary statistics.
+The `.mat` release packs store the generated experiment artifacts required by the demo scripts, including certified executor data, trained controllers, baseline objects, and evaluation data. The MATLAB live scripts load these release packs and reproduce the reported testing protocol, figures, timing summaries, feasibility checks, and closed-loop evaluation results.
 
-The full offline generation pipeline used to synthesize every certified library and train every controller from scratch is not included in this release. Therefore, the intended use of this repository is:
+The intended workflow is:
 
-1. load the released experiment packs;
-2. run the corresponding MATLAB live scripts;
-3. reproduce the reported figures and evaluation metrics;
+1. load the released experiment pack;
+2. run the corresponding MATLAB live script;
+3. reproduce the reported evaluation metrics and figures;
 4. inspect the deployed CertNet executor and baseline behavior.
 
 ---
@@ -112,7 +119,7 @@ The release was prepared and tested in a Windows MATLAB environment.
 - **Solvers/Libraries used in the experiments:** MOSEK, YALMIP, MPT3
 - **Compiled evaluators:** Windows 64-bit MEX files (`*.mexw64`)
 
-The included MEX files are Windows 64-bit binaries. On non-Windows platforms, these binaries will not run directly. Recompilation or a MATLAB fallback implementation would be required for non-Windows use.
+The included MEX files are Windows 64-bit binaries. On non-Windows platforms, these binaries will not run directly without recompilation or a MATLAB fallback implementation.
 
 MOSEK requires a valid license if the scripts call solver-dependent baseline or projection routines.
 
@@ -129,7 +136,7 @@ The repository includes paper-ready PDF figures and PNG previews for GitHub visu
 | [`sim_CA.pdf`](sim_CA.pdf) | [`sim_CA.png`](sim_CA.png) | Control allocation closed-loop trajectories under deadline-limited execution |
 | [`sim_ACC.pdf`](sim_ACC.pdf) | [`sim_ACC.png`](sim_ACC.png) | ACC closed-loop speed, input, and safety-margin trajectories |
 
-The PNG files are shown once in the corresponding experiment sections below. The PDF files are retained as paper-ready versions.
+The PNG files are shown once in the corresponding experiment sections below. The PDF files are retained as high-quality paper-ready versions.
 
 ---
 
@@ -158,9 +165,7 @@ where:
 - `lambda_theta` lies on the simplex;
 - `rho_theta` is nonnegative.
 
-Thus, feasibility follows structurally from the certified family, rather than from online optimization, online projection, or post-hoc repair.
-
-The learned proposer only controls the coefficients inside the certified feasible family. Therefore, approximation error may affect performance recovery, but not the hard-feasibility guarantee of the certified executor.
+Thus, feasibility follows structurally from the certified family. Learning affects performance recovery through coefficient selection, but it does not remove the hard-feasibility protection provided by the certified executor.
 
 ---
 
@@ -172,7 +177,10 @@ A standard strictly convex mpQP constructs an explicit PWA optimizer by partitio
 
 The figure compares these two representations on a two-dimensional unbounded hard-constrained example, shown on a bounded plotting window. The left panel shows the explicit mpQP critical-region partition. The right panel shows the certified active validity-region cover generated by the active library, where the color indicates the number of queried active candidates.
 
-![PWA partition vs. certified active validity-region cover](sim_region_compare.png)
+<p align="center">
+  <img src="sim_region_compare.png" width="620" alt="PWA partition vs. certified active validity-region cover"><br>
+  <b>PWA partition vs. certified active validity-region cover.</b>
+</p>
 
 PDF version: [`sim_region_compare.pdf`](sim_region_compare.pdf)
 
@@ -207,7 +215,10 @@ Compared methods:
 
 The figure reports the latency-feasibility behavior of all methods. The timing panels summarize mean, median, and p99 runtime, while the violation-CDF panels show the hard-constraint residual distribution relative to the numerical feasibility tolerance. This directly evaluates whether low runtime is obtained without losing hard-interface feasibility.
 
-![mpQP benchmark timing and hard-feasibility diagnostics](sim_mpQP.png)
+<p align="center">
+  <img src="sim_mpQP.png" width="760" alt="mpQP benchmark timing and hard-feasibility diagnostics"><br>
+  <b>mpQP benchmark timing and hard-feasibility diagnostics.</b>
+</p>
 
 PDF version: [`sim_mpQP.pdf`](sim_mpQP.pdf)
 
@@ -263,7 +274,10 @@ Compared methods:
 
 The figure shows the closed-loop behavior under this deadline-enforced execution rule. It is designed to test not only raw controller quality, but also whether runtime tails and deadline misses propagate into closed-loop degradation.
 
-![Control allocation closed-loop trajectories under deadline-limited execution](sim_CA.png)
+<p align="center">
+  <img src="sim_CA.png" width="700" alt="Control allocation closed-loop trajectories under deadline-limited execution"><br>
+  <b>Control allocation closed-loop trajectories under deadline-limited execution.</b>
+</p>
 
 PDF version: [`sim_CA.pdf`](sim_CA.pdf)
 
@@ -316,7 +330,10 @@ Compared methods:
 
 The figure shows closed-loop speed, input, and safety-margin behavior. This benchmark tests whether the certified executor can recover the behavior of a safety-filtering teacher while keeping the online path non-iterative and low-latency.
 
-![ACC closed-loop speed, input, and safety-margin trajectories](sim_ACC.png)
+<p align="center">
+  <img src="sim_ACC.png" width="700" alt="ACC closed-loop speed, input, and safety-margin trajectories"><br>
+  <b>ACC closed-loop speed, input, and safety-margin trajectories.</b>
+</p>
 
 PDF version: [`sim_ACC.pdf`](sim_ACC.pdf)
 
@@ -374,12 +391,12 @@ n_LAct  = 4
 
 This repository supports reproduction of the released evaluation artifacts:
 
-- loading trained/released controllers;
-- evaluating CertNet and baselines;
+- loading released controller and baseline artifacts;
+- evaluating CertNet and baselines under the reported protocols;
 - reproducing timing, feasibility, and closed-loop metrics;
-- regenerating the provided paper figures.
+- regenerating the provided figures.
 
-This repository does not claim to provide a complete from-scratch rebuild of every controller, library, and training run from raw random seeds. The included release packs are the intended reproduction interface.
+The release packs are the intended evaluation interface for the reported experiments.
 
 ---
 
@@ -391,7 +408,7 @@ The manuscript is currently under review. A formal citation will be added after 
 
 ## License
 
-This project is released under the license included in this repository. See [`LICENSE`](LICENSE`.
+This project is released under the license included in this repository. See [`LICENSE`](LICENSE).
 
 ---
 
