@@ -369,18 +369,7 @@ This repository does not claim to provide a complete from-scratch rebuild of eve
 
 ## Citation
 
-If you use this repository in your research, please cite the corresponding paper:
-
-```bibtex
-@article{liao2026certnet,
-  title   = {Provably Constraint-Satisfying Low-Latency Control via Structural Decoupling of Feasibility and Performance},
-  author  = {Liao, Jiaping and Xiang, Weiming},
-  journal = {Manuscript},
-  year    = {2026}
-}
-```
-
-Please update the BibTeX entry after publication.
+The manuscript is currently under review. A formal citation will be added after publication.
 
 ---
 
