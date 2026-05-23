@@ -1,10 +1,10 @@
 # CertNet Control Simulation Release
 
-This repository provides a MATLAB evaluation package for the accompanying manuscript:
+This repository provides a MATLAB evaluation package for the accompanying paper:
 
 **Provably Constraint-Feasible Low-Latency Control via Feasibility–Performance Decoupling**
 
-The manuscript is currently under review. This repository is provided to support reproducibility of the reported experiments.
+This repository is provided to support reproducibility of the reported experiments.
 
 ## Key Message
 
@@ -386,7 +386,7 @@ The release packs are the intended evaluation interface for the reported experim
 
 ## Citation
 
-The manuscript is currently under review. A formal citation will be added after publication.
+The paper is currently under review. A formal citation will be added after publication.
 
 ---
 
