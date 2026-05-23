@@ -139,10 +139,10 @@ The repository includes paper-ready PDF figures and PNG previews for GitHub visu
 
 | PDF figure | PNG preview | Description |
 |---|---|---|
-| [`sim_region_compare.pdf`](sim_region_compare.pdf) | [`sim_region_compare.png`](sim_region_compare.png) | PWA critical-region partition vs. certified active validity-region cover |
-| [`sim_mpQP.pdf`](sim_mpQP.pdf) | [`sim_mpQP.png`](sim_mpQP.png) | mpQP benchmark timing and hard-feasibility diagnostics |
-| [`sim_CA.pdf`](sim_CA.pdf) | [`sim_CA.png`](sim_CA.png) | Control allocation closed-loop trajectories under deadline-limited execution |
-| [`sim_ACC.pdf`](sim_ACC.pdf) | [`sim_ACC.png`](sim_ACC.png) | ACC closed-loop speed, input, and safety-margin trajectories |
+| [`sim_region_compare.pdf`](sim_region_compare.pdf) | [`sim_region_compare.png`](sim_region_compare.png) | Geometry comparison between the explicit PWA optimizer partition and the certified active validity-region cover |
+| [`sim_mpQP.pdf`](sim_mpQP.pdf) | [`sim_mpQP.png`](sim_mpQP.png) | Runtime, tail-latency, and hard-feasibility diagnostics for the mpQP benchmarks |
+| [`sim_CA.pdf`](sim_CA.pdf) | [`sim_CA.png`](sim_CA.png) | Deadline-aware closed-loop control allocation trajectories and runtime effects |
+| [`sim_ACC.pdf`](sim_ACC.pdf) | [`sim_ACC.png`](sim_ACC.png) | ACC closed-loop speed, control input, and safety-margin behavior |
 
 The PNG files are displayed once in the corresponding experiment sections below. The PDF files are retained as high-quality paper-ready versions.
 
@@ -175,6 +175,11 @@ The figure compares these two representations on a two-dimensional unbounded har
 </p>
 
 PDF version: [`sim_region_compare.pdf`](sim_region_compare.pdf)
+
+**How to read this figure.**  
+The left panel should be read as the objective-dependent explicit optimizer representation: each region corresponds to a critical region of the explicit mpQP solution. A larger number of regions indicates a more complex explicit partition that must be compiled and searched during deployment. The right panel should be read as CertNet's feasibility-oriented representation: it does not attempt to reproduce the full optimizer partition, but instead shows where the active validity regions provide certified feasible candidates. The color in the right panel indicates the local number of queried active candidates, i.e., how many active feasibility candidates are available at each plotted parameter point.
+
+The key point is not that the two plots should look identical. They represent different objects. The PWA plot visualizes the optimizer partition, while the CertNet plot visualizes a certified feasible cover used by the deployed executor.
 
 In this example:
 
@@ -213,6 +218,11 @@ The figure summarizes runtime and hard-feasibility behavior. The timing panels s
 </p>
 
 PDF version: [`sim_mpQP.pdf`](sim_mpQP.pdf)
+
+**How to read this figure.**  
+This figure should be read from two perspectives. The runtime panels compare the average and tail execution cost of each method; lower bars indicate faster online evaluation, and the p99 value indicates whether a method has large runtime tails. The feasibility panels show the distribution of hard-constraint residuals over the test set. Points on the feasible side of the numerical threshold correspond to constraint satisfaction within tolerance, while mass on the infeasible side corresponds to observed hard-constraint violations.
+
+The important comparison is therefore joint: a method is useful for hard-constrained real-time deployment only if it is both fast and feasible. PureNN is very fast but can violate the hard constraints. NN+Proj restores feasibility by solving an additional projection problem, which increases runtime and tail latency. CertNet is designed to keep the online path non-iterative while preserving hard feasibility through the certified executor.
 
 Run:
 
@@ -269,6 +279,11 @@ The figure shows the closed-loop behavior under this deadline-enforced execution
 
 PDF version: [`sim_CA.pdf`](sim_CA.pdf)
 
+**How to read this figure.**  
+This figure should be read as a closed-loop test, not only as a pointwise policy comparison. The trajectory panels show whether the controller maintains the desired closed-loop behavior under the same sampling budget. The input or allocation-related panels show how each method realizes the commanded control action. The deadline-related behavior is important: when a method exceeds the sampling time, the held action can affect subsequent states, so occasional runtime tails may accumulate into visible trajectory degradation.
+
+The main observation is that raw speed alone is insufficient. PureNN can evaluate quickly, but it does not guarantee the hard interface. Opt gives the reference optimization behavior, but its runtime can exceed the sampling deadline. NN+Proj repairs infeasible neural outputs, but projection calls introduce additional runtime tails. CertNet is intended to preserve feasibility and avoid deadline-induced degradation by using a certified, non-iterative online executor.
+
 Run:
 
 ```matlab
@@ -324,6 +339,11 @@ The figure shows closed-loop speed, input, and safety-margin behavior. This benc
 </p>
 
 PDF version: [`sim_ACC.pdf`](sim_ACC.pdf)
+
+**How to read this figure.**  
+This figure should be read as a safety-filtering rollout. The speed-related panels show whether the vehicle follows the desired cruising behavior. The input panel shows whether the commanded acceleration or control action remains compatible with the hard interface. The safety-margin panel is the most important safety diagnostic: a nonnegative margin indicates that the safety constraint is respected, while a negative margin indicates a safety violation or rollout failure.
+
+The key comparison is between safe behavior and runtime cost. PureNN can be fast but may enter unsafe states because it is not constrained by construction. NN+Proj repairs many infeasible actions, but projection may still introduce runtime and robustness issues. CertNet is intended to match the Opt-like safety behavior while reducing both average and tail online runtime.
 
 Run:
 
