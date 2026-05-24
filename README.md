@@ -151,15 +151,14 @@ The PNG files are displayed once in the corresponding experiment sections below.
 
 ## Method-Level Interpretation
 
-CertNet separates three roles that are usually entangled in hard-constrained controllers:
+CertNet separates two roles that are often entangled in hard-constrained controllers:
 
 - **Feasibility protection:** handled by the certified executor and the precomputed feasible family.
 - **Performance recovery:** handled by learning inside that feasible family.
-- **Low-latency execution:** obtained from a decoupled online structure based on logical queries and algebraic operations, without iterative optimization or projection.
 
-This design is different from directly learning the control action and then repairing it afterward. As a result, learning errors may affect performance quality, but the hard-feasibility protection is inherited from the certified executor structure.
+Unlike methods that learn an unconstrained action and repair it afterward, CertNet enforces feasibility structurally. Learning errors may affect performance, but they do not directly become hard-constraint violations.
 
-The experiments below are organized to show this distinction across different settings: mpQP benchmarks, deadline-aware control allocation, and ACC safety filtering.
+This decoupling reduces the complexity of jointly handling feasibility and performance, supporting a non-iterative, low-latency deployment path. The experiments below illustrate these features through region comparison, mpQP benchmarks, deadline-aware control allocation, and ACC safety filtering.
 
 ---
 
