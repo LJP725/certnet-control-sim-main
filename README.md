@@ -11,12 +11,12 @@ This repository is provided to support reproducibility of the reported experimen
 CertNet is designed for hard-constrained real-time control problems where **feasibility**, **performance**, and **online latency** must be considered together.
 The experiments compare CertNet with representative controller types:
 
-- **Online optimization (QP/Opt):** reliable and high-quality, but slower and sensitive to runtime tails.
+- **Online optimization (QP/Opt):** online optimization baselines, denoted by **QP** for standard mpQP benchmarks and **Opt** for closed-loop control benchmarks that are not standard mpQP instances; reliable and high-quality, but slower and sensitive to runtime tails.
 - **Explicit PWA control:** fast when available, but can require a large objective-induced partition and may become impractical to compile.
 - **PureNN:** very fast, but does not enforce hard constraints.
 - **NN+Proj:** restores feasibility through projection, but reintroduces online correction cost and tail latency.
 - **CertNet:** preserves hard feasibility through a certified executor while keeping online evaluation non-iterative and low-latency.
-- 
+
 All neural policies within each benchmark use the same training stopping rule, with termination triggered by either reaching the prescribed MSE tolerance or the maximum number of training epochs.
 
 Across the released benchmarks, CertNet achieves **zero observed hard-constraint violation rate above the numerical tolerance**, competitive tracking or teacher-matching performance, and substantial speedups over online optimization.
@@ -158,13 +158,13 @@ CertNet separates two roles that are often entangled in hard-constrained control
 
 Unlike methods that learn an unconstrained action and repair it afterward, CertNet enforces feasibility structurally. Learning errors may affect performance, but they do not directly become hard-constraint violations.
 
-This decoupling reduces the complexity of jointly handling feasibility and performance, supporting a non-iterative, low-latency deployment path. The experiments below illustrate these features through region comparison, mpQP benchmarks, deadline-aware control allocation, and ACC safety filtering.
+This decoupling reduces the complexity of jointly handling feasibility and performance, enabling a non-iterative, low-latency deployment path. The experiments below illustrate these features through the region comparison, mpQP benchmarks, deadline-aware control allocation, and ACC safety filtering.
 
 ---
 
 ## 1. mpQP PWA Partition vs. Feasibility-Certified Active Cover
 
-This demo illustrates why CertNet does not need to reconstruct the full explicit optimizer partition.
+This demo illustrates why CertNet does not need to reconstruct the full explicit optimizer partition and highlights the resulting deployment advantages. 
 
 For a strictly convex mpQP, an explicit PWA solution partitions the parameter space according to both the hard constraints and objective-dependent KKT optimality conditions. CertNet instead focuses on the hard-constraint-induced feasible structure and uses a learned policy to recover optimizer-like performance within the certified family, while preserving hard feasibility by construction.
 
@@ -183,6 +183,8 @@ In this example:
 
 - the explicit mpQP solution contains **52** critical regions;
 - CertNet deploys **23** active candidates.
+
+This illustrative region-comparison example is separate from the larger mpQP benchmark instances reported below.
 
 This comparison highlights the intended structural advantage. By decoupling feasibility protection from performance recovery, CertNet avoids reconstructing the full objective-induced optimizer partition. The deployed controller only needs to query the smaller certified active cover, run a fast neural selector, and perform algebraic reconstruction. This reduces online complexity, preserves feasibility, and supports deployable low-latency execution.
 
@@ -262,6 +264,8 @@ Compared methods:
 - **PureNN:** unconstrained neural policy;
 - **NN+Proj:** neural policy with projection repair;
 - **CertNet:** certified executor.
+  
+Explicit PWA control is not included here because a tractable explicit optimizer representation is not available for this deployment setting.
 
 The figure shows the closed-loop behavior under this deadline-enforced execution rule. It tests whether runtime tails and deadline misses propagate into trajectory-level degradation.
 
@@ -321,6 +325,8 @@ Compared methods:
 - **NN+Proj:** neural policy with projection repair;
 - **CertNet:** certified executor.
 
+Explicit PWA control is not included here because a tractable explicit optimizer representation is not available for this deployment setting.
+
 The figure shows closed-loop speed, input, and safety-margin behavior. This benchmark tests whether the certified executor can recover the behavior of a safety-filtering teacher while keeping the online path low-latency.
 
 <p align="center">
@@ -330,7 +336,7 @@ The figure shows closed-loop speed, input, and safety-margin behavior. This benc
 
 PDF version: [`sim_ACC.pdf`](sim_ACC.pdf)
 
-This figure shows whether each controller can preserve safe ACC behavior during rollout. PureNN is fast but leads to unsafe behavior because hard constraints are not enforced by construction. NN+Proj repairs many infeasible actions, but the projection step becomes a runtime and robustness bottleneck. CertNet closely follows the Opt-like safe trajectory while keeping both mean and tail runtime low.
+This figure shows whether each controller can preserve safe ACC behavior during rollout. PureNN is fast but leads to unsafe behavior because hard constraints are not enforced. NN+Proj repairs many infeasible actions, but the projection step becomes a robustness bottleneck. CertNet closely follows the Opt-like safe trajectory while keeping both mean and tail runtime low.
 
 Run:
 
@@ -347,7 +353,7 @@ open("demo_acc_.mlx")
 | NN+Proj | 173.8 us | 1054.4 us | 4.63x | 0.07% | stop 568/1500 | N/A |
 | **CertNet** | **24.7 us** | **56.3 us** | **32.60x** | **0.00%** | **safe** | **1.651e1** |
 
-PureNN is fast but unsafe in closed-loop rollout. NN+Proj repairs many infeasible neural outputs, but projection becomes a runtime and robustness bottleneck. CertNet follows Opt-like safe behavior while substantially reducing both mean and tail runtime.
+PureNN is fast but unsafe in closed-loop rollout. NN+Proj repairs many infeasible neural outputs, but projection becomes a robustness bottleneck. CertNet follows Opt-like safe behavior while substantially reducing both mean and tail runtime.
 
 Released ACC artifacts:
 
