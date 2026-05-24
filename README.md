@@ -16,6 +16,7 @@ The experiments compare CertNet with representative controller types:
 - **PureNN:** very fast, but does not enforce hard constraints.
 - **NN+Proj:** restores feasibility through projection, but reintroduces online correction cost and tail latency.
 - **CertNet:** preserves hard feasibility through a certified executor while keeping online evaluation non-iterative and low-latency.
+- 
 All neural policies within each benchmark use the same training stopping rule, with termination triggered by either reaching the prescribed MSE tolerance or the maximum number of training epochs.
 
 Across the released benchmarks, CertNet achieves **zero observed hard-constraint violation rate above the numerical tolerance**, competitive tracking or teacher-matching performance, and substantial speedups over online optimization.
