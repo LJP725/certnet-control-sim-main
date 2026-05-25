@@ -27,8 +27,8 @@ Across the released benchmarks, CertNet achieves **zero observed hard-constraint
 
 | Benchmark | CertNet mean runtime | CertNet p99 runtime | Speedup vs. optimization | Hard-feasibility violation rate | Main observation |
 |---|---:|---:|---:|---:|---|
-| mpQP S1 | 33.02 us | 66.20 us | 36.01x vs QP | 0.00% | Feasible and faster than QP/PWA in this implementation |
-| mpQP S2 | 46.41 us | 85.20 us | 26.89x vs QP | 0.00% | PWA compilation times out; CertNet remains deployable |
+| mpQP S1 | 34.35 us | 71.50 us | 37.59x vs QP | 0.00% | Feasible and faster than QP/PWA in this implementation |
+| mpQP S2 | 57.26 us | 117.95 us | 25.11x vs QP | 0.00% | PWA compilation times out; CertNet remains deployable |
 | CA | 63.3 us | 185.8 us | 15.89x vs Opt | 0.00% | Zero deadline misses under `T_s = 1000 us` |
 | ACC | 24.7 us | 56.3 us | 32.60x vs Opt | 0.00% | Safe rollout with Opt-like behavior |
 
@@ -229,17 +229,17 @@ open("demo_mpqp_.mlx")
 
 | Setting | Method | Mean runtime | p99 runtime | Speedup | Violation rate | Mean `u`-MSE |
 |---|---:|---:|---:|---:|---:|---:|
-| S1 | QP | 1188.92 us | 1626.65 us | 1.00x | 0.00% | --- |
-| S1 | PWA | 477.95 us | 612.65 us | 2.49x | 0.00% | 7.81e-11 |
-| S1 | PureNN | 8.59 us | 16.00 us | 138.39x | 30.78% | 2.94e-2 |
-| S1 | NN+Proj | 295.27 us | 1218.35 us | 4.03x | 0.00% | 2.82e-2 |
-| S1 | **CertNet** | **33.02 us** | **66.20 us** | **36.01x** | **0.00%** | **2.50e-2** |
-| S2 | QP | 1247.93 us | 1612.85 us | 1.00x | 0.00% | --- |
-| S2 | PureNN | 9.87 us | 17.15 us | 126.46x | 50.82% | 4.16e-2 |
-| S2 | NN+Proj | 477.67 us | 1165.95 us | 2.61x | 0.00% | 3.90e-2 |
-| S2 | **CertNet** | **46.41 us** | **85.20 us** | **26.89x** | **0.00%** | **3.34e-2** |
+| S1 | QP | 1290.99 us | 2075.40 us | 1.00x | 0.00% | --- |
+| S1 | PWA | 497.71 us | 676.95 us | 2.59x | 0.00% | 7.81e-11 |
+| S1 | PureNN | 8.95 us | 17.90 us | 144.19x | 30.78% | 2.94e-2 |
+| S1 | NN+Proj | 319.78 us | 1376.60 us | 4.04x | 0.00% | 2.82e-2 |
+| S1 | **CertNet** | **34.35 us** | **71.50 us** | **37.59x** | **0.00%** | **2.50e-2** |
+| S2 | QP | 1437.78 us | 2495.75 us | 1.00x | 0.00% | --- |
+| S2 | PureNN | 12.17 us | 23.00 us | 118.17x | 50.82% | 4.16e-2 |
+| S2 | NN+Proj | 558.25 us | 1787.15 us | 2.58x | 0.00% | 3.90e-2 |
+| S2 | **CertNet** | **57.26 us** | **117.95 us** | **25.11x** | **0.00%** | **3.34e-2** |
 
-For NN+Proj, the projection-use rates are **30.84%** in S1 and **50.96%** in S2. This explains the increased mean and tail runtime compared with the raw neural predictor.
+For NN+Proj, the projection-use rates are **30.78%** in S1 and **50.82%** in S2. This explains the increased mean and tail runtime compared with the raw neural predictor.
 
 ### mpQP Offline Representation
 
